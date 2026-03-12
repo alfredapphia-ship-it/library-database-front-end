@@ -24,7 +24,7 @@ function BookItem({ book, onBorrow }) {
         <strong>Status:</strong> {book.available ? "✅ Available" : "❌ Not Available"}
       </p>
       <button 
-        onClick={() => onBorrow(book.id)}
+        onClick={() => onBorrow(book._id || book.id)}
         disabled={!book.available}
         style={{
           marginTop: "10px",

@@ -1,13 +1,38 @@
 //shows borrowed books
-import React, { useState } from "react";
-import { borrowedBooks as initialBorrowedBooks } from "../data/books";
+import React, { useState, useContext, useEffect } from "react";
+import { borrowedBooks as initialBorrowedBooks } from "../data/books"; // keep mock fallback
+import api from "../utils/api";
+import { AuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const Borrowed = () => {
-  const [borrowedBooks, setBorrowedBooks] = useState(initialBorrowedBooks);
+  const [borrowedBooks, setBorrowedBooks] = useState([]);
+  const { user } = useContext(AuthContext);
 
-  const handleReturn = (bookId) => {
-    alert(`Book returned successfully! (ID: ${bookId})`);
-    setBorrowedBooks(borrowedBooks.filter(book => book.id !== bookId));
+ useEffect(() => {
+  if (!user) return;
+
+  axios
+    .get(`http://localhost:5000/borrowed/user/${user._id}`)
+    .then(res => setBorrowedBooks(res.data.data))
+    .catch(err => {
+      console.error("Error fetching borrowed books", err);
+      setBorrowedBooks(initialBorrowedBooks);
+      toast.error("Unable to load your borrowed books, using offline data");
+    });
+  }, [user]);
+
+  const handleReturn = (recordId, bookId) => {
+    api.put(`/books/${bookId}/return`)
+      .then(() => {
+        toast.success("Book returned successfully");
+        setBorrowedBooks(prev => prev.filter(b => b.id !== recordId));
+      })
+      .catch(err => {
+        console.error("Return error", err);
+        toast.error("Failed to return book");
+      });
   };
 
   const getOverdueStatus = (dueDate) => {
@@ -73,7 +98,7 @@ const Borrowed = () => {
                   </p>
                 </div>
                 <button 
-                  onClick={() => handleReturn(book.id)}
+                  onClick={() => handleReturn(book.id, book.bookId || book._id)}
                   style={{
                     padding: "10px 20px",
                     backgroundColor: "#3498db",

@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
+import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUserName("");
+    logout();           // clears user from context & localStorage
+    navigate("/login"); // redirect after logout
   };
 
   return (
@@ -20,44 +21,36 @@ const Navbar = () => {
 
         <ul className="nav-menu">
           <li className="nav-item">
-            <Link to="/" className="nav-link">
-              Home
-            </Link>
+            <Link to="/" className="nav-link">Home</Link>
           </li>
           <li className="nav-item">
-            <Link to="/books" className="nav-link">
-              Books
-            </Link>
+            <Link to="/books" className="nav-link">Books</Link>
           </li>
           <li className="nav-item">
-            <Link to="/borrowed" className="nav-link">
-              Borrowed
-            </Link>
+            <Link to="/borrowed" className="nav-link">Borrowed</Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/newbook" className="nav-link">Add Book</Link>
           </li>
         </ul>
+        
 
-        <div className="nav-auth">
-          {!isLoggedIn ? (
-            <>
-              <Link to="/login" className="nav-link">
-                Login
-              </Link>
-              <Link to="/register" className="nav-link-btn">
-                Register
-              </Link>
-            </>
-          ) : (
-            <>
-              <span className="user-name">Welcome, {userName}!</span>
-              <button className="logout-btn" onClick={handleLogout}>
-                Logout
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </nav>
-  );
-};
-
-export default Navbar;
+                <div className="nav-auth">
+                  {!user ? (
+                    <>
+                      <Link to="/login" className="nav-link">Login</Link>
+                      <Link to="/register" className="nav-link-btn">Register</Link>
+                    </>
+                  ) : (
+                    <>
+                      <span className="user-name">{user.name}</span>
+                      <button onClick={handleLogout} className="nav-link-btn">Logout</button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </nav>
+          );
+        };
+        
+        export default Navbar;

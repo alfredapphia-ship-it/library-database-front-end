@@ -7,7 +7,7 @@ const Home = () => {
     <div style={{ minHeight: "100vh", backgroundColor: "#f5f6fa" }}>
       {/* Hero Section */}
       <div style={{ 
-        backgroundColor: "#2c3e50", 
+        backgroundColor: "#2f4356", 
         color: "white", 
         padding: "60px 40px",
         textAlign: "center"
